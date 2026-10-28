@@ -9,16 +9,11 @@ def login_and_scrape(login_url, user, pwd):
     """Log in and return quotes visible after authentication."""
     session = requests.Session()
 
-    response = session.get(login_url, timeout=10)
-    response.raise_for_status()
-
+    response = session.get(login_url)
     soup = BeautifulSoup(response.text, "html.parser")
 
     csrf_input = soup.find("input", {"name": "csrf_token"})
-    if csrf_input is None:
-        raise ValueError("CSRF token not found")
-
-    csrf_token = csrf_input.get("value")
+    csrf_token = csrf_input["value"]
 
     login_data = {
         "username": user,
@@ -26,17 +21,7 @@ def login_and_scrape(login_url, user, pwd):
         "csrf_token": csrf_token
     }
 
-    response = session.post(
-        login_url,
-        data=login_data,
-        timeout=10
-    )
-    response.raise_for_status()
-
-    quotes_url = "https://quotes.toscrape.com/"
-    response = session.get(quotes_url, timeout=10)
-    response.raise_for_status()
-
+    response = session.post(login_url, data=login_data)
     soup = BeautifulSoup(response.text, "html.parser")
 
     quotes = []

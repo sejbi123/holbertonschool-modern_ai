@@ -3,38 +3,42 @@
 
 import time
 from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.chrome.options import Options
 
 
 def scrape_product_detail(url, delay=2.0):
-    """Return the details of a single product."""
-    options = Options()
-    options.add_argument("--headless")
-    options.add_argument("--window-size=1920,1080")
-    options.add_argument("--no-sandbox")
-
-    driver = webdriver.Chrome(options=options)
+    """Return the title, price, description, and rating of a product."""
+    driver = webdriver.Chrome()
 
     try:
         driver.get(url)
         time.sleep(delay)
 
-        caption = driver.find_element(By.CSS_SELECTOR, ".caption")
-        title = caption.find_elements(By.TAG_NAME, "h4")[1].text
+        title = driver.execute_script("""
+            const headings = document.querySelectorAll('.caption h4');
+            return headings.length > 1 ? headings[1].innerText.trim() : '';
+        """)
 
-        price = driver.find_element(
-            By.CSS_SELECTOR, "h4.price"
-        ).text
+        price = driver.execute_script("""
+            const element = document.querySelector('h4.price');
+            return element ? element.innerText.trim() : '';
+        """)
 
-        description = driver.find_element(
-            By.CSS_SELECTOR, "p.description"
-        ).text
+        description = driver.execute_script("""
+            const element = document.querySelector('p.description');
+            return element ? element.innerText.trim() : '';
+        """)
 
-        ratings = driver.find_elements(
-            By.CSS_SELECTOR, ".ratings p.ws-icon.ws-icon-star"
-        )
-        rating = len(ratings)
+        rating = driver.execute_script("""
+            return document.querySelectorAll(
+                '.ratings p[data-rating]'
+            ).length
+                ? parseInt(document.querySelector(
+                    '.ratings p[data-rating]'
+                ).getAttribute('data-rating'))
+                : document.querySelectorAll(
+                    '.ratings .ws-icon-star'
+                ).length;
+        """)
 
         return {
             "title": title,
@@ -45,3 +49,4 @@ def scrape_product_detail(url, delay=2.0):
 
     finally:
         driver.quit()
+        

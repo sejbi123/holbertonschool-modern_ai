@@ -3,50 +3,42 @@
 
 import time
 from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.chrome.options import Options
 
 
 def scrape_products(url):
     """Extract product details from a category page."""
-    options = Options()
-    options.add_argument("--headless")
-    options.add_argument("--window-size=1920,1080")
-    options.add_argument("--no-sandbox")
-
-    driver = webdriver.Chrome(options=options)
+    driver = webdriver.Chrome()
     products = []
 
     try:
         driver.get(url)
         time.sleep(2)
 
-         product_elements = driver.find_elements(
-            By.CSS_SELECTOR, ".thumbnail"
-        )
+        product_elements = driver.execute_script("""
+            return Array.from(
+                document.querySelectorAll('.thumbnail')
+            ).map(product => {
+                const title = product.querySelector('a.title');
+                const price = product.querySelector('h4.price');
+                const description = product.querySelector('p.description');
+                const rating = product.querySelector(
+                    '.ratings p[data-rating]'
+                );
+
+                return {
+                    title: title ? title.getAttribute('title') : '',
+                    price: price ? price.innerText.trim() : '',
+                    description: description
+                        ? description.innerText.trim() : '',
+                    rating: rating
+                        ? parseInt(rating.getAttribute('data-rating'))
+                        : 0
+                };
+            });
+        """)
 
         for product in product_elements:
-            title_element = product.find_element(
-                By.CSS_SELECTOR, "a.title"
-            )
-            price_element = product.find_element(
-                By.CSS_SELECTOR, "h4.price"
-            )
-            description_element = product.find_element(
-                By.CSS_SELECTOR, "p.description"
-            )
-            rating_element = product.find_element(
-                By.CSS_SELECTOR, ".ratings p[data-rating]"
-            )
-
-            products.append({
-                "title": title_element.get_attribute("title"),
-                "price": price_element.text,
-                "description": description_element.text,
-                "rating": int(
-                    rating_element.get_attribute("data-rating")
-                )
-            })
+            products.append(product)
 
     finally:
         driver.quit()
