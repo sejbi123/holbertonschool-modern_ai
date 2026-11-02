@@ -8,6 +8,8 @@ def scroll_and_scrape(url, scroll_pause=2.0):
     """Scroll an infinite-scroll page and scrape all unique products."""
     options = webdriver.ChromeOptions()
     options.add_argument("--headless")
+    options.add_argument("--no-sandbox")
+    options.add_argument("--disable-dev-shm-usage")
     driver = webdriver.Chrome(options=options)
     try:
         driver.get(url)

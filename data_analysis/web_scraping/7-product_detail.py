@@ -5,7 +5,16 @@ from selenium import webdriver
 
 
 def scrape_product_detail(url, delay=2.0):
-    """Open a product detail page and return its details."""
+    """Open a product detail page and return its details.
+
+    Args:
+        url: URL of the product detail page.
+        delay: seconds to wait after opening the page.
+
+    Returns:
+        A dictionary with the keys "title", "price", "description"
+        and "rating".
+    """
     options = webdriver.ChromeOptions()
     options.add_argument("--headless")
     options.add_argument("--no-sandbox")
@@ -30,4 +39,4 @@ def scrape_product_detail(url, delay=2.0):
         }
     finally:
         driver.quit()
-    
+        
