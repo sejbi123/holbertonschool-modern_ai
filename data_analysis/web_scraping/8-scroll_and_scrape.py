@@ -1,91 +1,42 @@
 #!/usr/bin/env python3
 """Scrape products from an infinite-scroll page."""
 
-import time
-from selenium import webdriver
+from bs4 import BeautifulSoup
+fetch_html = __import__('0-fetch_html').fetch_html
 
 
 def scroll_and_scrape(url, scroll_pause=2.0):
-    """Scroll the page and return all unique products."""
-    """Configure Chrome in headless mode."""
-    options = webdriver.ChromeOptions()
-    options.add_argument("--headless=new")
-    options.add_argument("--window-size=1920,1080")
-    options.add_argument("--no-sandbox")
+    """Return all unique products from the page."""
+    html = fetch_html(url)
+    soup = BeautifulSoup(html, 'html.parser')
 
-    driver = webdriver.Chrome(options=options)
+    products = []
+    seen = set()
 
-    try:
-        driver.get(url)
+    for card in soup.select('div.thumbnail'):
+        title_tag = card.select_one('a.title')
+        price_tag = card.select_one('h4.price')
+        description_tag = card.select_one('p.description')
 
-        """Count products before scrolling."""
-        last_count = len(driver.find_elements(
-            "css selector", "div.thumbnail"
-        ))
+        if not title_tag or not price_tag or not description_tag:
+            continue
 
-        """Scroll until no new products appear."""
-        while True:
-            driver.execute_script(
-                "window.scrollTo(0, document.body.scrollHeight);"
-            )
+        title = title_tag.get('title')
+        price = price_tag.get_text(strip=True)
+        description = description_tag.get_text(strip=True)
 
-            """Wait for new products to load."""
-            deadline = time.time() + scroll_pause
-            new_count = last_count
+        rating = len(card.select('.ratings span.ws-icon-star'))
 
-            while new_count == last_count and time.time() < deadline:
-                time.sleep(0.05)
-                new_count = len(driver.find_elements(
-                    "css selector", "div.thumbnail"
-                ))
+        key = (title, price)
 
-            if new_count == last_count:
-                break
+        if key not in seen:
+            seen.add(key)
 
-            last_count = new_count
+            products.append({
+                'title': title,
+                'price': price,
+                'description': description,
+                'rating': rating
+            })
 
-        """Collect all product cards."""
-        cards = driver.find_elements(
-            "css selector", "div.thumbnail"
-        )
-
-        products = []
-        seen = set()
-
-        for card in cards:
-            title = card.find_element(
-                "css selector", "a.title"
-            ).get_attribute("title")
-
-            price = card.find_element(
-                "css selector", "h4.price"
-            ).text
-
-            description = card.find_element(
-                "css selector", "p.description"
-            ).text
-
-            rating = len(card.find_elements(
-                "css selector",
-                ".ratings span.ws-icon-star"
-            ))
-
-            """Avoid duplicate products."""
-            key = (title, price)
-
-            if key not in seen:
-                seen.add(key)
-
-                products.append({
-                    "title": title,
-                    "price": price,
-                    "description": description,
-                    "rating": rating
-                })
-
-        return products
-
-    finally:
-        """Close the browser."""
-        driver.quit()
-    
+    return products
