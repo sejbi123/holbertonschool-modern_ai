@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
-import pandas as pd
+"""Drop the customerID column from the DataFrame."""
 
 
 def drop_customerID(df):
-    """Drop the customerID column because it contains unique customer identifiers"""
+    """Remove the customerID column and return the DataFrame."""
     df = df.drop(columns=['customerID'])
 
-    # Return the updated DataFrame
     return df
