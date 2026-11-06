@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
-"""Drop the customerID column from the DataFrame."""
+"""
+Remove the customerID column from a DataFrame.
+"""
 
 
 def drop_customerID(df):
-    """Remove the customerID column and return the DataFrame."""
-    df = df.drop(columns=['customerID'])
-
-    return df
+    """
+    Drop customerID and return the modified DataFrame.
+    """
+    return df.drop(columns=['customerID'])
