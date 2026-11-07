@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-"""Visualize relationships between numerical features using a correlation heatmap."""
+"""Visualize correlations between numerical features."""
 
 import seaborn as sns
 import matplotlib.pyplot as plt
 
 
 def plot_correlation_heatmap(df):
-    """Generate a heatmap to illustrate correlations among numerical features."""
+    """Create a heatmap to show correlations between numeric features."""
     plt.figure(figsize=(6, 5))
 
     numeric_df = df.select_dtypes(include="number")
