@@ -16,10 +16,12 @@ def plot_continuous_distributions(df, columns_to_plot=None):
 
     n_cols = len(columns_to_plot)
 
-    fig, axes = plt.subplots(n_cols, 2, figsize=(12, 8))
+    fig, axes = plt.subplots(
+        n_cols, 2, figsize=(12, 6)
+    )
 
     if n_cols == 1:
-        axes = axes.reshape(1, -1)
+        axes = axes.reshape(1, 2)
 
     for i, col in enumerate(columns_to_plot):
         data = df[col].dropna()
@@ -42,13 +44,20 @@ def plot_continuous_distributions(df, columns_to_plot=None):
             linestyle="--"
         )
 
-        axes[i, 0].set_title(f"{col} Histogram + KDE")
+        axes[i, 0].set_title(
+            f"{col} Histogram + KDE"
+        )
 
-        axes[i, 1].boxplot(data, vert=False)
-        axes[i, 1].set_title(f"{col} Boxplot")
+        axes[i, 1].boxplot(
+            data,
+            vert=False
+        )
+
+        axes[i, 1].set_title(
+            f"{col} Boxplot"
+        )
 
     plt.tight_layout()
-    plt.savefig("Task_8.png")
     plt.show()
 
     return None
