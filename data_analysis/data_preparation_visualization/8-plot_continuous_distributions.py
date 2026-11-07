@@ -24,7 +24,7 @@ def plot_continuous_distributions(df, columns_to_plot=None):
     for i, col in enumerate(columns_to_plot):
         data = df[col].dropna()
 
-        # Left: Histogram
+        # Plot the histogram
         axes[i, 0].hist(
             data,
             bins=30,
@@ -33,7 +33,7 @@ def plot_continuous_distributions(df, columns_to_plot=None):
             edgecolor="black"
         )
 
-        # KDE calculation
+        # Calculate and plot the KDE
         kde = stats.gaussian_kde(data)
         x = np.linspace(data.min(), data.max(), 100)
 
@@ -46,7 +46,7 @@ def plot_continuous_distributions(df, columns_to_plot=None):
 
         axes[i, 0].set_title(f"{col} Histogram + KDE")
 
-        # Right: Horizontal boxplot
+        # Plot the horizontal boxplot
         axes[i, 1].boxplot(data, vert=False)
         axes[i, 1].set_title(f"{col} Boxplot")
 

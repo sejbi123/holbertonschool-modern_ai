@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""Plot numeric feature distributions based on churn categories."""
+"""Plot numeric features by churn."""
 
 import matplotlib.pyplot as plt
 
 
 def plot_numeric_vs_churn(df, col):
-    """Display the distribution of a numeric feature for each churn category."""
+    """Plot a numeric feature by churn."""
     plt.figure(figsize=(12, 8))
 
     no_churn = df[df["Churn"] == "No"][col]
