@@ -21,7 +21,7 @@ def plot_continuous_distributions(df, columns_to_plot=None):
     )
 
     if n_cols == 1:
-        axes = axes.reshape(1, 2)
+        axes = axes.reshape(1, -1)
 
     for i, col in enumerate(columns_to_plot):
         data = df[col].dropna()
@@ -58,6 +58,7 @@ def plot_continuous_distributions(df, columns_to_plot=None):
         )
 
     plt.tight_layout()
+    plt.savefig("Task_8.png")
     plt.show()
 
     return None
